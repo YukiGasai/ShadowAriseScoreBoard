@@ -13,7 +13,7 @@ mongoose.connect(process.env.DB_URL, () => {
 
 app.use(bodyParser.json());
 
-app.post('/view', async (req, res) => {
+app.post('/api/view', async (req, res) => {
 	if (req.body.password === 'Gronbowski') {
 		const scores = await Score.find();
 		res.status(200).json(scores);
@@ -22,7 +22,7 @@ app.post('/view', async (req, res) => {
 	}
 });
 
-app.post('/add', async (req, res) => {
+app.post('/api/add', async (req, res) => {
 	if (req.body.password === 'Gronbowski') {
 		const ipAddr =
 			req.headers['x-forwarded-for'] ||
@@ -39,6 +39,10 @@ app.post('/add', async (req, res) => {
 	} else {
 		res.status(4001).json({ msg: 'cheater' });
 	}
+});
+
+app.get('/', (req, res) => {
+	res.sendFile('page.html', { root: __dirname });
 });
 
 app.listen(PORT, () => {
