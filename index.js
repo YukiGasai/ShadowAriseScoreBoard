@@ -78,7 +78,6 @@ app.get('/api/name', async (req, res) => {
  * Get own Scores
  */
 app.get('/api/me', async (req, res) => {
-	let result = {};
 	const ipAddr =
 		req.headers['x-forwarded-for'] || req.socket.remoteAddress || '187.361.0.1';
 
@@ -88,12 +87,7 @@ app.get('/api/me', async (req, res) => {
 		.sort([[sort, sortOrder]])
 		.lean();
 
-	const numberIp = parseInt(ipAddr.replace(/\D/g, ''), 10);
-	result.ip = randomName(numberIp);
-	result.amount = scores.length;
-	result.scores = cleanScores(scores);
-
-	res.send(result);
+	res.send(scores);
 });
 
 /**
