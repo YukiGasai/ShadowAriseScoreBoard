@@ -4,6 +4,7 @@ const app = express();
 const mongoose = require('mongoose');
 const Score = require('./models/scoreModel');
 const bodyParser = require('body-parser');
+const cors = require('cors');
 
 const PORT = process.env.PORT || 3000;
 
@@ -12,6 +13,8 @@ mongoose.connect(process.env.DB_URL, () => {
 });
 
 app.use(bodyParser.json());
+
+app.use(cors());
 
 app.post('/api/view', async (req, res) => {
 	if (req.body.password === 'Gronbowski') {
@@ -37,7 +40,16 @@ app.post('/api/add', async (req, res) => {
 		const savedScore = await newSore.save();
 		res.status(200).json(savedScore);
 	} else {
-		res.status(4001).json({ msg: 'cheater' });
+		res.status(401).json({ msg: 'cheater' });
+	}
+});
+
+app.post('/api/position', async (req, res) => {
+	if (req.body.password === 'Gronbowski') {
+		const savedScore = await newSore.save();
+		res.status(200).json(savedScore);
+	} else {
+		res.status(401).json({ msg: 'cheater' });
 	}
 });
 
