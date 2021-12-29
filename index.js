@@ -18,7 +18,8 @@ const {
 const randomName = seed => {
 	return uniqueNamesGenerator({
 		dictionaries: [adjectives, colors, animals],
-		seed,
+		seed: seed,
+		length: 2,
 	});
 };
 
@@ -27,6 +28,45 @@ const cleanScores = scores => {
 		const numberIp = parseInt(score.ip.replace(/\D/g, ''), 10);
 		return { ...score, ip: randomName(numberIp) };
 	});
+};
+
+const formatScore = scores => {
+	return scores.map(score => {
+		let createdAt = convertDate(score.createdAt);
+		let gameTime = converTime(score.gameTime);
+		return { ...score, createdAt, gameTime };
+	});
+};
+
+//2021-12-28T22:34:44.128Z
+const convertDate = timestamp => {
+	let date = new Date(timestamp);
+	let day = date.getDate() < 10 ? '0' + date.getDate() : date.getDate();
+	let month =
+		date.getMonth() + 1 < 10 ? '0' + date.getMonth() + 1 : date.getMonth() + 1;
+	let year =
+		date.getFullYear() < 10 ? '0' + date.getFullYear() : date.getFullYear();
+	let hour = date.getHours() < 10 ? '0' + date.getHours() : date.getHours();
+	let minute =
+		date.getMinutes() < 10 ? '0' + date.getMinutes() : date.getMinutes();
+	let second =
+		date.getSeconds() < 10 ? '0' + date.getSeconds() : date.getSeconds();
+	return (
+		day + '.' + month + '.' + year + ' ' + hour + ':' + minute + ':' + second
+	);
+};
+
+//2021-12-28T22:34:44.128Z
+const converTime = time => {
+	let hours = Math.floor(time / 3600);
+	let minutes = Math.floor(time / 60);
+	let seconds = time % 60;
+
+	if (hours < 10) hours = '0' + hours;
+	if (minutes < 10) minutes = '0' + minutes;
+	if (seconds < 10) seconds = '0' + seconds;
+
+	return hours + ':' + minutes + ':' + seconds;
 };
 
 mongoose.connect(process.env.DB_URL, () => {
@@ -44,21 +84,32 @@ app.get('/api/view', async (req, res) => {
 	const sort = req.query.sort || 'gameTime';
 	const sortOrder = req.query.sortOrder || 1;
 	const showGrouped = req.query.grouped || 'true';
+	const format = req.query.format || 'false';
 	const scores = await Score.find({})
 		.sort([[sort, sortOrder]])
 		.lean();
 
+	console.log(format);
+
 	const grouped = [];
-	console.log(showGrouped);
 	if (showGrouped == 'true') {
 		scores.forEach(score => {
 			if (!grouped.some(group => group.ip === score.ip)) {
 				grouped.push(score);
 			}
 		});
-		res.status(200).json(cleanScores(grouped));
+
+		if (format == 'true') {
+			res.status(200).json(formatScore(cleanScores(grouped)));
+		} else {
+			res.status(200).json(cleanScores(grouped));
+		}
 	} else {
-		res.status(200).json(cleanScores(scores));
+		if (format == 'true') {
+			res.status(200).json(formatScore(cleanScores(scores)));
+		} else {
+			res.status(200).json(cleanScores(scores));
+		}
 	}
 });
 
