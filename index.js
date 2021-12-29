@@ -89,8 +89,6 @@ app.get('/api/view', async (req, res) => {
 		.sort([[sort, sortOrder]])
 		.lean();
 
-	console.log(format);
-
 	const grouped = [];
 	if (showGrouped == 'true') {
 		scores.forEach(score => {
