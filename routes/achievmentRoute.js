@@ -115,7 +115,14 @@ router.post('/add', async (req, res) => {
 		a => a.template.index == req.body.index
 	);
 
-	console.log(foundAchievment);
+	if (foundAchievment.length) {
+		if (foundAchievment[0].isFinished) {
+			return res
+				.status(200)
+				.json({ done: foundAchievment[0].isFinished, alreadyDone: true });
+		}
+	}
+
 	try {
 		//ADD
 		if (!foundAchievment.length) {
@@ -128,7 +135,7 @@ router.post('/add', async (req, res) => {
 				process: addAmount,
 				isFinished,
 			}).save();
-			return res.status(200).json(newAchievment);
+			return res.status(200).json({ done: isFinished, alreadyDone: false });
 			//UPDATE
 		} else {
 			console.log('UPDATEING');
@@ -140,7 +147,9 @@ router.post('/add', async (req, res) => {
 				foundTenplate.count < amount ? foundTenplate.count : amount;
 
 			const savedAchievment = await foundAchievment[0].save();
-			return res.status(200).json(savedAchievment);
+			return res
+				.status(200)
+				.json({ done: foundAchievment[0].isFinished, alreadyDone: false });
 		}
 	} catch (err) {
 		console.log(err);
