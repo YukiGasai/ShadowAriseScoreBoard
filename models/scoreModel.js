@@ -2,7 +2,7 @@ const mongoose = require('mongoose');
 
 const scoreModel = new mongoose.Schema(
 	{
-		ip: {
+		name: {
 			type: String,
 			required: true,
 		},
