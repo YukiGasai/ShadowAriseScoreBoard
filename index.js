@@ -47,6 +47,8 @@ app.use('/api/score', scoreRoute);
 app.use('/api/template', templateRoute);
 app.use('/api/achievment', achievmentRoute);
 
+app.use('/public', express.static('public'));
+
 app.get('/', (req, res) => {
 	res.sendFile('page.html', { root: __dirname });
 });
