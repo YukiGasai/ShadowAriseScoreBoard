@@ -1,6 +1,30 @@
 const router = require('express').Router();
 const Player = require('../models/playerModel');
+const Achievment = require('../models/achievmentModel');
+const AchievmentTemplate = require('../models/achievmentTemplateModel');
 const { randomName } = require('../helper/randomName');
+
+/**
+ * Get Player Count
+ */
+router.post('/count', async (req, res) => {
+	if (!req.body.ip)
+		return res.status(400).json({ err: true, msg: 'Missing data' });
+
+	let result = {};
+
+	result.done = (
+		await Achievment.find({ name: randomName(req.body.ip), isFinished: true })
+	).length;
+
+	result.inProgress = (
+		await Achievment.find({ name: randomName(req.body.ip), isFinished: false })
+	).length;
+
+	result.total = (await AchievmentTemplate.find({})).length;
+
+	res.status(200).json(result);
+});
 
 /**
  * Get Player Name
