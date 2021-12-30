@@ -5,13 +5,6 @@ const Player = require('../models/playerModel');
 const { convertDate, converTime } = require('../helper/converter');
 const { randomName } = require('../helper/randomName');
 
-const cleanScores = scores => {
-	return scores.map(score => {
-		const numberIp = parseInt(score.ip.replace(/\D/g, ''), 10);
-		return { ...score, ip: randomName(numberIp) };
-	});
-};
-
 const formatScore = scores => {
 	return scores.map(score => {
 		let createdAt = convertDate(score.createdAt);
@@ -36,21 +29,21 @@ router.post('/view', async (req, res) => {
 	const grouped = [];
 	if (showGrouped == 'true') {
 		scores.forEach(score => {
-			if (!grouped.some(group => group.ip === score.ip)) {
+			if (!grouped.some(group => group.name === score.name)) {
 				grouped.push(score);
 			}
 		});
 
 		if (format == 'true') {
-			return res.status(200).json(formatScore(cleanScores(grouped)));
+			return res.status(200).json(formatScore(grouped));
 		} else {
-			return res.status(200).json(cleanScores(grouped));
+			return res.status(200).json(grouped);
 		}
 	} else {
 		if (format == 'true') {
-			return res.status(200).json(formatScore(cleanScores(scores)));
+			return res.status(200).json(formatScore(scores));
 		} else {
-			return res.status(200).json(cleanScores(scores));
+			return res.status(200).json(scores);
 		}
 	}
 });
@@ -83,18 +76,6 @@ router.post('/add', async (req, res) => {
 	)
 		return res.status(400).json({ err: true, msg: 'Missing data' });
 
-	const foundPlayer = await Player.findOne({ ip: req.body.ip });
-	if (!foundPlayer) {
-		const savedPlayer = await new Player({
-			ip: req.body.ip,
-			name: randomName(req.body.ip),
-		});
-		if (!savedPlayer) {
-			return res
-				.status(500)
-				.json({ err: true, msg: 'Internal error saving player' });
-		}
-	}
 	try {
 		const savedScore = await new Score({
 			name: randomName(req.body.ip),
