@@ -38,11 +38,7 @@ router.post('/all', async (req, res) => {
  * Get All collectet achievments by one player
  */
 router.post('/player', async (req, res) => {
-	if (
-		!req.body.ip ||
-		!req.body.password ||
-		req.body.password != process.env.PASS
-	)
+	if (!req.body.ip)
 		return res.status(400).json({ err: true, msg: 'Missing data' });
 
 	const allTemplates = await AchievmentTemplateModel.find({})
