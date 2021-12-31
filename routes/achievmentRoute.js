@@ -4,21 +4,27 @@ const Achievment = require('../models/achievmentModel');
 const { randomName } = require('../helper/randomName');
 
 const getStats = async index => {
-	let count = await Achievment.find({ isFinished: true }).populate('template');
+	let totalPlayerCount = await Achievment.find({ isFinished: 'true' }).populate(
+		'template'
+	);
 
-	count = count.filter(achievment => achievment.template.index == 10);
+	totalPlayerCount = totalPlayerCount.filter(
+		achievment => achievment.template.index == 10
+	);
+
+	totalPlayerCount = totalPlayerCount.length;
+
+	let count = await Achievment.find({ isFinished: 'true' }).populate(
+		'template'
+	);
+
+	count = count.filter(achievment => achievment.template.index == index);
 
 	count = count.length;
 
-	let total = await Achievment.find({}).populate('template');
-
-	total = total.filter(achievment => achievment.template.index == index);
-
-	total = total.length;
-
-	if (total == 0) return 0;
-
-	return (count / total) * 100;
+	if (totalPlayerCount == 0) return 0;
+	console.log(totalPlayerCount, count);
+	return Math.round((count / totalPlayerCount) * 100);
 };
 
 router.post('/all', async (req, res) => {
@@ -138,6 +144,7 @@ router.post('/add', async (req, res) => {
 				process: addAmount,
 				isFinished,
 			}).save();
+
 			return res.status(200).json({
 				done: isFinished,
 				alreadyDone: false,
