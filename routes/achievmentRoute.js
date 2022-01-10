@@ -23,7 +23,6 @@ const getStats = async index => {
 	count = count.length;
 
 	if (totalPlayerCount == 0) return 0;
-	console.log(totalPlayerCount, count);
 	return Math.round((count / totalPlayerCount) * 100);
 };
 
@@ -185,6 +184,28 @@ router.delete('/', async (req, res) => {
 		return res.status(400).json({ err: true, msg: 'Missing data' });
 
 	const result = await Achievment.deleteMany({});
+	if (!result) {
+		return res
+			.status(500)
+			.json({ err: true, msg: 'Internal error deleting achievments' });
+	}
+
+	return res.status(200).json(result);
+});
+
+router.post('/unfinished', async (req, res) => {
+	if (
+		!req.body.ip ||
+		!req.body.password ||
+		req.body.password != process.env.PASS
+	)
+		return res.status(400).json({ err: true, msg: 'Missing data' });
+
+	const result = await Achievment.deleteMany({
+		name: randomName(req.body.ip),
+		isFinished: false,
+	});
+
 	if (!result) {
 		return res
 			.status(500)
