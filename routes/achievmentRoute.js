@@ -193,6 +193,30 @@ router.delete('/', async (req, res) => {
 	return res.status(200).json(result);
 });
 
+/*
+	Remove all achievments from Player
+*/
+router.post('/removePlayer', async (req, res) => {
+	if (
+		!req.body.ip ||
+		!req.body.password ||
+		req.body.password != process.env.PASS
+	)
+		return res.status(400).json({ err: true, msg: 'Missing data' });
+
+	const result = await Achievment.deleteMany({
+		name: randomName(req.body.ip),
+	});
+
+	if (!result) {
+		return res
+			.status(500)
+			.json({ err: true, msg: 'Internal error deleting achievments' });
+	}
+
+	return res.status(200).json(result);
+});
+
 router.post('/unfinished', async (req, res) => {
 	if (
 		!req.body.ip ||
