@@ -23,13 +23,6 @@ const randomName = seed => {
 		seed: seed,
 		length: 2,
 	});
-
-	console.log({
-		og,
-		seed,
-		name,
-	});
-
 	return name;
 };
 
